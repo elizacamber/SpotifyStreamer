@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">SpotifyStreamer</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_top10">Top10</string>
+    <string name="search">Searching for</string>
+    <string name="error">Artist not found. Try different search</string>
+    <string name="track_error">An error has occured. No tracks were found</string>
+    <string name="activity_settings">Settings</string>
+
+    <string name="pref_location_key">location</string>
+    <string name="pref_location_label">Location</string>
+
+</resources>

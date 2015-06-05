@@ -48,8 +48,9 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        artistList =new ArrayList<Artist>();
-        mArtistAdapter=new ArtistAdapter(artistList);
+        setRetainInstance(true);
+            artistList = new ArrayList<Artist>();
+            mArtistAdapter = new ArtistAdapter(artistList);
     }
 
     @Override
@@ -109,18 +110,19 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(List<Artist> artists) {
-            if(artists!=null)
+            if (artists != null){
                 mArtistAdapter.clear();
+                artistList.addAll(artists);
+        }
             if (artists.isEmpty())
                 Toast.makeText(getActivity(), getString(R.string.error), Toast.LENGTH_LONG).show();
-            artistList.addAll(artists);
         }
     }
 
     public class ArtistAdapter extends ArrayAdapter<Artist> {
 
         public ArtistAdapter(List<Artist> artists) {
-            super(getActivity(),0,artists);
+            super(getActivity(), 0, artists);
         }
 
         private class viewHolder{
@@ -130,7 +132,6 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-
             View v =convertView;
             viewHolder vh;
                 if(v==null){
@@ -144,7 +145,6 @@ public class MainActivityFragment extends Fragment {
                     vh=(viewHolder) v.getTag();
 
             Artist artist= artistList.get(position);
-
                 if (artist!=null){
                     vh.ArtistName.setText(artistList.get(position).name);
                         if(artistList.get(position).images.size()!=0){

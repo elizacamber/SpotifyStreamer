@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
 
 /**
  * Created by eliza on 3/6/2015.
- * Basic Code from <www.github/Udacity/Sunshine-Version-2.com>
+ * Code from <www.github/Udacity/Sunshine-Version-2.com>
  */
 public class SettingsActivity extends PreferenceActivity
         implements Preference.OnPreferenceChangeListener {

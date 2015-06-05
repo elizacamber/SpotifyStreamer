@@ -10,5 +10,6 @@
 
     <string name="pref_location_key">location</string>
     <string name="pref_location_label">Location</string>
+    <string name="pref_location_default">US</string>
 
 </resources>

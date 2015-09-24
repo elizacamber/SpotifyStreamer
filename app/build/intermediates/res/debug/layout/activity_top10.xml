@@ -1,0 +1,6 @@
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/fragmentTop10"
+    android:name="com.gdgthess.liz.spotifystreamer.Top10Fragment"
+    tools:layout="@layout/fragment_top10" android:layout_width="match_parent"
+    android:layout_height="match_parent" />
+<!-- From: file:/C:/Users/eliza/Desktop/SpotifyStreamer/app/src/main/res/layout/activity_top10.xml -->

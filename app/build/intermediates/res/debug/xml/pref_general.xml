@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="@string/pref_location_key"
+        android:title="@string/pref_location_label"
+        android:defaultValue="US"
+        android:entries="@array/listentries"
+        android:entryValues="@array/listvalues"/>
+</PreferenceScreen><!-- From: file:/C:/Users/eliza/Desktop/SpotifyStreamer/app/src/main/res/xml/pref_general.xml -->

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+<LinearLayout
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground">
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Track Name"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:id="@+id/trackNameTxt" />
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="200dp"
+        android:id="@+id/songImage"
+        android:layout_gravity="center_horizontal"
+        android:elevation="0.3dp"/>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Track Album"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:id="@+id/trackAlbumTxt" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Track Artist"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:id="@+id/trackArtistTxt" />
+
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <SeekBar
+            android:id="@+id/trackTimeSeekbar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="time elapsed"
+            android:layout_alignLeft="@+id/trackTimeSeekbar"
+            android:paddingLeft="10dp"
+            android:id="@+id/timeElapsedTxt" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_alignRight="@+id/trackTimeSeekbar"
+            android:paddingRight="10dp"
+            android:text="time left"
+            android:id="@+id/timeLeftTxt" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="25dp"
+            android:src="@android:drawable/ic_media_previous"
+            android:id="@+id/prevBtn" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:src="@android:drawable/ic_media_play"
+            android:id="@+id/playBtn" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="25dp"
+            android:src="@android:drawable/ic_media_next"
+            android:id="@+id/nextBtn" />
+    </RelativeLayout>
+</LinearLayout>
+    </ScrollView><!-- From: file:/C:/Users/eliza/Desktop/SpotifyStreamer/app/src/main/res/layout/fragment_player.xml -->

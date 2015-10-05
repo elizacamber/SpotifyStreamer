@@ -1370,7 +1370,7 @@ containing a value of this type.
         public static final int nextBtn=0x7f0e0050;
         public static final int none=0x7f0e000e;
         public static final int normal=0x7f0e000a;
-        public static final int playBtn=0x7f0e004f;
+        public static final int playPauseButton=0x7f0e004f;
         public static final int player_fragment_container=0x7f0e0042;
         public static final int prevBtn=0x7f0e004e;
         public static final int progress_circular=0x7f0e0005;
@@ -1478,14 +1478,15 @@ containing a value of this type.
         public static final int app_name=0x7f070012;
         public static final int error=0x7f070013;
         public static final int hello_world=0x7f070014;
-        public static final int pref_location_default=0x7f070015;
-        public static final int pref_location_key=0x7f070016;
-        public static final int pref_location_label=0x7f070017;
-        public static final int search=0x7f070018;
-        public static final int searchError=0x7f070019;
-        public static final int title_activity_player=0x7f07001a;
-        public static final int title_activity_top10=0x7f07001b;
-        public static final int track_error=0x7f07001c;
+        public static final int player_error=0x7f070015;
+        public static final int pref_location_default=0x7f070016;
+        public static final int pref_location_key=0x7f070017;
+        public static final int pref_location_label=0x7f070018;
+        public static final int search=0x7f070019;
+        public static final int searchError=0x7f07001a;
+        public static final int title_activity_player=0x7f07001b;
+        public static final int title_activity_top10=0x7f07001c;
+        public static final int track_error=0x7f07001d;
     }
     public static final class style {
         public static final int Animation_AppCompat_DropDownUp=0x7f08006b;

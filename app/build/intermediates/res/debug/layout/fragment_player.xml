@@ -85,11 +85,12 @@
             android:id="@+id/prevBtn" />
 
         <ImageButton
+            android:id="@+id/playPauseButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:src="@android:drawable/ic_media_play"
-            android:id="@+id/playBtn" />
+            android:src="@android:drawable/ic_media_pause"
+            android:layout_centerHorizontal="true">
+        </ImageButton>
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -100,4 +101,4 @@
             android:id="@+id/nextBtn" />
     </RelativeLayout>
 </LinearLayout>
-    </ScrollView><!-- From: file:/C:/Users/eliza/Desktop/SpotifyStreamer/app/src/main/res/layout/fragment_player.xml -->
+    </ScrollView><!-- From: file:/C:/Users/eliza/AndroidStudioProjects/SpotifyStreamer/app/src/main/res/layout/fragment_player.xml -->

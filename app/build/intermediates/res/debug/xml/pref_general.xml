@@ -6,4 +6,4 @@
         android:defaultValue="US"
         android:entries="@array/listentries"
         android:entryValues="@array/listvalues"/>
-</PreferenceScreen><!-- From: file:/C:/Users/eliza/Desktop/SpotifyStreamer/app/src/main/res/xml/pref_general.xml -->
+</PreferenceScreen><!-- From: file:/C:/Users/eliza/AndroidStudioProjects/SpotifyStreamer/app/src/main/res/xml/pref_general.xml -->

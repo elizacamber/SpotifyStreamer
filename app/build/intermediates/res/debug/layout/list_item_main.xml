@@ -22,4 +22,4 @@
         android:layout_toRightOf="@+id/list_item_artist_img">
     </TextView>
 
-</RelativeLayout><!-- From: file:/C:/Users/eliza/Desktop/SpotifyStreamer/app/src/main/res/layout/list_item_main.xml -->
+</RelativeLayout><!-- From: file:/C:/Users/eliza/AndroidStudioProjects/SpotifyStreamer/app/src/main/res/layout/list_item_main.xml -->

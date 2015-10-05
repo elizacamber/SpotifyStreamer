@@ -1,10 +1,13 @@
 package com.gdgthess.liz.spotifystreamer;
 
 import android.app.Dialog;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,20 +22,22 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Track;
 
-public class PlayerFragment extends DialogFragment{
+public class PlayerFragment extends DialogFragment {
 
     ImageView songImage;
-    TextView trackName , trackAlbum, trackArtist, trackElapsedTime, trackLeftTime;
-    ImageButton previous , play , next;
-    int selected;
+    TextView trackName, trackAlbum, trackArtist, trackElapsedTime, trackLeftTime;
+    ImageButton previous,  next, play_pause;
+    int selected, position;
     List<Track> trackList;
-    public static MediaPlayer mediaPlayer;
+    String url;
     private SeekBar seekBar;
+    boolean bounded;
+    PlayerService service;
+    Handler handler= new Handler();
     public static String RESTORE_CURRENT_TRACK = "restore_current_track";
 
     public PlayerFragment() {
@@ -52,11 +57,21 @@ public class PlayerFragment extends DialogFragment{
         return view;
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(RESTORE_CURRENT_TRACK, selected);
-    }
+    public ServiceConnection connection= new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            PlayerService.PlayerBinder mBinder= (PlayerService.PlayerBinder) iBinder;
+            service = mBinder.getService();
+            bounded= true;
+            updateSeekbar();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            Log.i("DISCONNECT", "DISCONNECTED");
+            bounded = false;
+        }
+    };
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -64,130 +79,107 @@ public class PlayerFragment extends DialogFragment{
 
         Top10Fragment fragment = (Top10Fragment) getFragmentManager().findFragmentById(R.id.fragmentTop10);
         trackList = fragment.trackList;
+        initUI();
 
-        mediaPlayer = new MediaPlayer();
+        if(savedInstanceState==null) {
+            // Stop service if it exists
+            try {
+                getActivity().stopService(new Intent(getActivity(), PlayerService.class));
+            } catch (Exception e) {}
 
-        View view = getView();
-        if(view != null)  {
-
-            trackName = (TextView) getView().findViewById(R.id.trackNameTxt);
-            trackAlbum = (TextView) getView().findViewById(R.id.trackAlbumTxt);
-            trackArtist = (TextView) getView().findViewById(R.id.trackArtistTxt);
-            trackElapsedTime= (TextView) getView().findViewById(R.id.timeElapsedTxt);
-            trackLeftTime= (TextView) getView().findViewById(R.id.timeLeftTxt);
-
-            songImage = (ImageView) getView().findViewById(R.id.songImage);
-            previous = (ImageButton) getView().findViewById(R.id.prevBtn);
-            play = (ImageButton) getView().findViewById(R.id.playBtn);
-            next = (ImageButton) getView().findViewById(R.id.nextBtn);
-            seekBar = (SeekBar) getView().findViewById(R.id.trackTimeSeekbar);
-            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-                    mediaPlayer.seekTo(seekBar.getProgress());
-                }
-            });
-
-            if (savedInstanceState==null) {
-                selected = Top10Fragment.getSelectedTrack();
-            }else
-                selected = savedInstanceState.getInt(RESTORE_CURRENT_TRACK);
-            preparePlayer(selected);
-            updateSeekBar();
-
-            previous.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.i("Previous Track","URL");
-
-                    if(selected > 0){
-                        if(mediaPlayer.isPlaying())mediaPlayer.stop();
-                        preparePlayer(--selected);
-                        play.setImageResource(android.R.drawable.ic_media_play);
-                        Toast.makeText(getActivity(), "Loading Previous track", Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-            });
-
-            play.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.i("Play / Pause","URL");
-                    if(mediaPlayer.isPlaying()){
-                        play.setImageResource(android.R.drawable.ic_media_play);
-                        mediaPlayer.pause();
-                    }
-                    else{
-                        play.setImageResource(android.R.drawable.ic_media_pause);
-                        mediaPlayer.start();
-                    }
-                }
-            });
-
-            next.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.i("Next Track", "URL");
-
-                    if(selected <= trackList.size()-2) {
-                        if (mediaPlayer.isPlaying()) mediaPlayer.stop();
-                        preparePlayer(++selected);
-                        play.setImageResource(android.R.drawable.ic_media_play);
-                        Toast.makeText(getActivity(), "Loading Next track", Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-            });
+            selected = Top10Fragment.getSelectedTrack();
+            url = trackList.get(selected).preview_url;
+            Intent i = new Intent(getActivity(), PlayerService.class);
+            i.putExtra("URL", url);
+            getActivity().startService(i);
+            getActivity().bindService(i, connection, Context.BIND_AUTO_CREATE);
+        }else{
+            selected = savedInstanceState.getInt(RESTORE_CURRENT_TRACK);
         }
+        getActivity().bindService(new Intent(getActivity(), PlayerService.class), connection, Context.BIND_AUTO_CREATE);
+        setLayout(selected);
 
+        previous.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                    Toast.makeText(getActivity(), "Loading Previous track", Toast.LENGTH_SHORT).show();
+                    selected = --selected;
+                    changeTrack(selected);
+            }
+        });
+
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                    Toast.makeText(getActivity(), "Loading Next track", Toast.LENGTH_SHORT).show();
+                    selected = ++selected;
+                    changeTrack(selected);
+            }
+        });
+
+        play_pause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pauseTrack();
+            }
+        });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) service.seekPosition(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+        
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-
-        mediaPlayer.stop();
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(RESTORE_CURRENT_TRACK, selected);
     }
 
-    public void preparePlayer(int selected){
-
-        Log.i("Opening track",selected+"");
-        if(selected == 0){
-            previous.setClickable(false);
-            next.setClickable(true);
-            previous.setVisibility(View.INVISIBLE);
-            next.setVisibility(View.VISIBLE);
+    public void pauseTrack(){
+        if (!bounded) return;
+        if (service.mPausePlay(position)) {
+            play_pause.setImageResource(android.R.drawable.ic_media_pause);
+        } else {
+            play_pause.setImageResource(android.R.drawable.ic_media_play);
         }
-        else if(selected == trackList.size() - 1){
-            next.setClickable(false);
-            previous.setClickable(true);
-            next.setVisibility(View.INVISIBLE);
-            previous.setVisibility(View.VISIBLE);
-        }
-        else{
-            previous.setClickable(true);
-            next.setClickable(true);
-            previous.setVisibility(View.VISIBLE);
-            next.setVisibility(View.VISIBLE);
-        }
+    }
 
+    public void changeTrack(int position){
+        setLayout(selected);
+        service.changeTrack(trackList.get(selected).preview_url);
+    }
 
-        mediaPlayer = null;
-        mediaPlayer = new MediaPlayer();
+    public void initUI() {
+        View view = getView();
+        if (view != null) {
+            trackName = (TextView) getView().findViewById(R.id.trackNameTxt);
+            trackAlbum = (TextView) getView().findViewById(R.id.trackAlbumTxt);
+            trackArtist = (TextView) getView().findViewById(R.id.trackArtistTxt);
+            trackElapsedTime = (TextView) getView().findViewById(R.id.timeElapsedTxt);
+            trackLeftTime = (TextView) getView().findViewById(R.id.timeLeftTxt);
+
+            songImage = (ImageView) getView().findViewById(R.id.songImage);
+            previous = (ImageButton) getView().findViewById(R.id.prevBtn);
+            play_pause= (ImageButton) getView().findViewById(R.id.playPauseButton);
+            next = (ImageButton) getView().findViewById(R.id.nextBtn);
+            seekBar = (SeekBar) getView().findViewById(R.id.trackTimeSeekbar);
+        }
+    }
+
+    public void setLayout(int selectedSong){
         Picasso.with(getActivity().getBaseContext()).load(trackList.get(selected).album.images.get(0).url).into(songImage);
-
-        String url = trackList.get(selected).preview_url; // your URL here
         trackName.setText(trackList.get(selected).name);
         trackAlbum.setText(trackList.get(selected).album.name);
 
@@ -196,56 +188,50 @@ public class PlayerFragment extends DialogFragment{
         artists = artists.substring(0, artists.length() - 2);
         trackArtist.setText(artists);
 
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        try {
-            mediaPlayer.setDataSource(url);
-            mediaPlayer.prepare(); // might take long! (for buffering, etc)
-            seekBar.setMax(mediaPlayer.getDuration());
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (selectedSong==0){
+            previous.setClickable(false);
+            next.setClickable(true);
+            previous.setVisibility(View.INVISIBLE);
+            next.setVisibility(View.VISIBLE);
+        }else if(selected == trackList.size() - 1){
+            next.setClickable(false);
+            previous.setClickable(true);
+            next.setVisibility(View.INVISIBLE);
+            previous.setVisibility(View.VISIBLE);
+        }else{
+            previous.setClickable(true);
+            next.setClickable(true);
+            previous.setVisibility(View.VISIBLE);
+            next.setVisibility(View.VISIBLE);
         }
-
     }
 
-    public void updateSeekBar() {
+    @Override
+    public void onDestroy() {
+        /*stopService(music);*/
+        if (bounded) {
+            getActivity().unbindService(connection);
+            bounded = false;
+        }
+        super.onStop();
+    }
 
-        // Worker thread that will update the seekbar as each song is playing
-        Thread t = new Thread() {
-            Handler handler = new Handler();
+    public void updateSeekbar(){
+        handler.postDelayed(mUpdateSeekbar,100);
+    }
 
-            @Override
-            public void run() {
-
-                int total = (int) mediaPlayer.getDuration();
-                seekBar.setMax(total);
-                while (mediaPlayer!= null
-                        && mediaPlayer.getCurrentPosition() < total) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        return;
-                    } catch (Exception e) {
-                        return;
-                    }
-
-                    if(mediaPlayer != null) seekBar.setProgress(mediaPlayer.getCurrentPosition());
-
-                    handler.post(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            seekBar.setProgress(mediaPlayer.getCurrentPosition());
-                            trackElapsedTime.setText("0:" + mediaPlayer.getCurrentPosition() / 1000);
-                            trackLeftTime.setText("0:"+(mediaPlayer.getDuration()-mediaPlayer.getCurrentPosition())/1000);
-                        }
-                    });
-
-                }
-
+    private Runnable mUpdateSeekbar = new Runnable() {
+        @Override
+        public void run() {
+            if (bounded) {
+                seekBar.setMax(service.maxDuration());
+                position = service.currentPosition();
+                seekBar.setProgress(position);
+                trackElapsedTime.setText("0:" +service.currentPosition()/1000);
+                int timeLeft= (service.maxDuration()- service.currentPosition()) /1000;
+                trackLeftTime.setText("0:" + timeLeft);
+                handler.postDelayed(mUpdateSeekbar, 100);
             }
-
-        };
-        t.start();
-    }
+        }
+    };
 }

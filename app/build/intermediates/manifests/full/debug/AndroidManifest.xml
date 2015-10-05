@@ -50,6 +50,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.gdgthess.liz.spotifystreamer.MainActivity" />
         </activity>
+
+        <service android:name="com.gdgthess.liz.spotifystreamer.PlayerService" />
     </application>
 
 </manifest>

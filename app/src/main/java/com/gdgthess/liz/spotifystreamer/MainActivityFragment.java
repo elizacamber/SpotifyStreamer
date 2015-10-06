@@ -37,6 +37,7 @@ import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
 import kaaes.spotify.webapi.android.models.Pager;
+import retrofit.RetrofitError;
 
 
 /**
@@ -200,9 +201,15 @@ public class MainActivityFragment extends Fragment {
         protected List<Artist> doInBackground(String... params) {
             SpotifyApi api = new SpotifyApi();
             SpotifyService spotify = api.getService();
-            ArtistsPager results = spotify.searchArtists(search_txt.getText().toString());
-            Pager<Artist> artistsPager = results.artists;
-            List<Artist> list = artistsPager.items;
+            List<Artist> list=null;
+            try {
+                ArtistsPager results = spotify.searchArtists(search_txt.getText().toString());
+                Pager<Artist> artistsPager = results.artists;
+                list = artistsPager.items;
+            }catch (RetrofitError e){
+                Log.e("Error loading artists", e+"");
+                return null;
+            }
             return list;
         }
 

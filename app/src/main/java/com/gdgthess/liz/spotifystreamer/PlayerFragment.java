@@ -138,7 +138,7 @@ public class PlayerFragment extends DialogFragment {
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-        
+
     }
 
     @Override
@@ -178,7 +178,8 @@ public class PlayerFragment extends DialogFragment {
         }
     }
 
-    public void setLayout(int selectedSong){
+
+    public void setLayout(int selectedSong) {
         Picasso.with(getActivity().getBaseContext()).load(trackList.get(selected).album.images.get(0).url).into(songImage);
         trackName.setText(trackList.get(selected).name);
         trackAlbum.setText(trackList.get(selected).album.name);
@@ -204,6 +205,13 @@ public class PlayerFragment extends DialogFragment {
             previous.setVisibility(View.VISIBLE);
             next.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (getDialog() != null && getRetainInstance())
+            getDialog().setOnDismissListener(null);
+        super.onDestroyView();
     }
 
     @Override

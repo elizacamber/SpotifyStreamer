@@ -1,15 +1,12 @@
 package com.gdgthess.liz.spotifystreamer;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,9 +27,9 @@ import java.util.Map;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
-import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
+import retrofit.RetrofitError;
 
 
 /**
@@ -63,7 +60,7 @@ public class Top10Fragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setRetainInstance(true);
         sharedpreferences = getActivity().getSharedPreferences("TabletMode", Context.MODE_PRIVATE);
         mTwoPane = sharedpreferences.getBoolean("isTablet",false);
 
@@ -96,17 +93,20 @@ public class Top10Fragment extends android.support.v4.app.Fragment {
         });
 
         SearchTracks task=new SearchTracks();
-        task.execute(artistID);
+        try {
+            task.execute(artistID);
+        }catch (RetrofitError error){
+            Toast.makeText(getActivity(), getResources().getString(R.string.error), Toast.LENGTH_SHORT).show();
+        }
         return rootview;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        SearchTracks task=new SearchTracks();
-        task.execute(artistID);
-    }
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        SearchTracks task=new SearchTracks();
+//        task.execute(artistID);
+//    }
 
     public void setSelectedTrack(int track){
         selectedTrack = track;
@@ -139,7 +139,13 @@ public class Top10Fragment extends android.support.v4.app.Fragment {
             prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
             location = prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
             mMap.put("country",location);
-            Tracks result=spotify.getArtistTopTrack(artistID, mMap);
+            Tracks result=null;
+            try {
+                result = spotify.getArtistTopTrack(artistID, mMap);
+            }catch (RetrofitError e){
+                Log.e("Error loading tracks", e+"");
+                return null;
+            }
             return result.tracks;
         }
 
